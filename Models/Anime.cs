@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Reflection.Metadata;
 
 
 namespace AnimeAndMangaDatabase.Models { 
@@ -27,11 +28,13 @@ public class Anime
 
     public Anime()
     {
-        ShowStillOngoing = ShowStatus.Yes;
-        WaitingForNewDubs = DubStatus.Yes;
-        WaitingForNewSeason = SeasonStatus.Yes;
+        ShowStillOngoing = ShowStatus.No;
+        WaitingForNewDubs = DubStatus.No;
+        WaitingForNewSeason = SeasonStatus.No;
 
     }
+
+//Remember to update this so it is a dropdown that the user can select from if they liked it or not
         [Required]
         [RegularExpression(@"^(G|PG|PG-13|R|NC-17)$")]
         public string? Rating { get; set; }

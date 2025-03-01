@@ -42,6 +42,8 @@ else
                     </InputSelect>
                     <ValidationMessage For="() => Anime.ShowStillOngoing" class="text-danger" />
                 </div>
+                @if (Anime.ShowStillOngoing == ShowStatus.Yes)
+                {
                 <div class="mb-3">
                     <label for="waitingfornewdubs" class="form-label">Are you waiting for new dubs?</label>
                     <InputSelect id="waitingfornewdubs" @bind-Value="Anime.WaitingForNewDubs" class="form-control">
@@ -67,6 +69,7 @@ else
                     <InputDate id="releasedatefornextseason" @bind-Value="Anime.ReleaseDateForNextSeason" class="form-control" />
                     <ValidationMessage For="() => Anime.ReleaseDateForNextSeason" class="text-danger" />
                 </div>
+                }
                 <div class="mb-3">
                     <label for="genre" class="form-label">What is the genre?</label>
                     <InputSelect id="genre" @bind-Value="Anime.Genre" class="form-control">

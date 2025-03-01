@@ -35,32 +35,36 @@
                 </InputSelect>
                 <ValidationMessage For="() => Anime.ShowStillOngoing" class="text-danger" />
             </div>
-            <div class="mb-3">
-                <label for="waitingfornewdubs" class="form-label">Are you waiting for new dubs?</label>
-                <InputSelect id="waitingfornewdubs" @bind-Value="Anime.WaitingForNewDubs" class="form-control">
-                    @foreach (var status in Enum.GetValues<DubStatus>())
-                    {
-                        <option value="@status">@status</option>
-                    }
-                </InputSelect>
-                <ValidationMessage For="() => Anime.WaitingForNewDubs" class="text-danger" />
-            </div>
+            @if (Anime.ShowStillOngoing == ShowStatus.Yes)
+            {
+                <div class="mb-3">
+                    <label for="waitingfornewdubs" class="form-label">Are you waiting for new dubs?</label>
+                    <InputSelect id="waitingfornewdubs" @bind-Value="Anime.WaitingForNewDubs" class="form-control">
+                        @foreach (var status in Enum.GetValues<DubStatus>())
+                        {
+                            <option value="@status">@status</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="() => Anime.WaitingForNewDubs" class="text-danger" />
+                </div>
 
-            <div class="mb-3">
-                <label for="waitingfornewseason" class="form-label">Is there a new season coming out?</label>
-                <InputSelect id="waitingfornewseason" @bind-Value="Anime.WaitingForNewSeason" class="form-control">
-                    @foreach (var status in Enum.GetValues<SeasonStatus>())
-                    {
-                        <option value="@status">@status</option>
-                    }
-                </InputSelect>
-                <ValidationMessage For="() => Anime.WaitingForNewSeason" class="text-danger" />
-            </div>
-            <div class="mb-3">
-                <label for="releasedatefornextseason" class="form-label">What is the release date for the new season?</label>
-                <InputDate id="releasedatefornextseason" @bind-Value="Anime.ReleaseDateForNextSeason" class="form-control" />
-                <ValidationMessage For="() => Anime.ReleaseDateForNextSeason" class="text-danger" />
-            </div>
+                <div class="mb-3">
+                    <label for="waitingfornewseason" class="form-label">Is there a new season coming out?</label>
+                    <InputSelect id="waitingfornewseason" @bind-Value="Anime.WaitingForNewSeason" class="form-control">
+                        @foreach (var status in Enum.GetValues<SeasonStatus>())
+                        {
+                            <option value="@status">@status</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="() => Anime.WaitingForNewSeason" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="releasedatefornextseason" class="form-label">What is the release date for the new season?</label>
+                    <InputDate id="releasedatefornextseason" @bind-Value="Anime.ReleaseDateForNextSeason" class="form-control" />
+                    <ValidationMessage For="() => Anime.ReleaseDateForNextSeason" class="text-danger" />
+                </div>
+            }
+
             <div class="mb-3">
                 <label for="genre" class="form-label">What is the genre</label>
                 <InputSelect id="genre" @bind-Value="Anime.Genre" class="form-control">
