@@ -1,0 +1,144 @@
+﻿@page "/animes/edit/"
+@using Microsoft.EntityFrameworkCore
+@using AnimeAndMangaDatabase.Models
+@inject IDbContextFactory<AnimeAndMangaDatabase.Data.AnimeAndMangaDatabaseContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Anime</h2>
+<hr />
+@if (Anime is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Anime" OnValidSubmit="UpdateAnime" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert" />
+                <input type="hidden" name="Anime.Id" value="@Anime.Id" />
+                <div class="mb-3">
+                    <label for="title" class="form-label">Name of Anime</label>
+                    <InputText id="title" @bind-Value="Anime.Title" class="form-control" />
+                    <ValidationMessage For="() => Anime.Title" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="datelastwatched" class="form-label">Date Last Watched</label>
+                    <InputDate id="datelastwatched" @bind-Value="Anime.DateLastWatched" class="form-control" />
+                    <ValidationMessage For="() => Anime.DateLastWatched" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="showstillongoing" class="form-label">Is the show still ongoing?</label>
+                    <InputSelect id="showstillongoing" @bind-Value="Anime.ShowStillOngoing" class="form-control">
+                        @foreach (var status in Enum.GetValues<ShowStatus>())
+                        {
+                            <option value="@status">@status</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="() => Anime.ShowStillOngoing" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="waitingfornewdubs" class="form-label">Are you waiting for new dubs?</label>
+                    <InputSelect id="waitingfornewdubs" @bind-Value="Anime.WaitingForNewDubs" class="form-control">
+                        @foreach (var status in Enum.GetValues<DubStatus>())
+                        {
+                            <option value="@status">@status</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="() => Anime.WaitingForNewDubs" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="waitingfornewseason" class="form-label">Is there a new season coming out?</label>
+                    <InputSelect id="waitingfornewseason" @bind-Value="Anime.WaitingForNewSeason" class="form-control">
+                        @foreach (var status in Enum.GetValues<SeasonStatus>())
+                        {
+                            <option value="@status">@status</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="() => Anime.WaitingForNewSeason" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="releasedatefornextseason" class="form-label">What is the release date for the new season?</label>
+                    <InputDate id="releasedatefornextseason" @bind-Value="Anime.ReleaseDateForNextSeason" class="form-control" />
+                    <ValidationMessage For="() => Anime.ReleaseDateForNextSeason" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="genre" class="form-label">What is the genre?</label>
+                    <InputSelect id="genre" @bind-Value="Anime.Genre" class="form-control">
+                        @foreach (var genre in Enum.GetValues<Genre>())
+                        {
+                            <option value="@genre">@genre</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="() => Anime.Genre" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="rating" class="form-label">Rating:</label>
+                    <InputText id="rating" @bind-Value="Anime.Rating" class="form-control" />
+                    <ValidationMessage For="() => Anime.Rating" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/animes">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private Anime? Anime { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Anime ??= await context.Anime.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (Anime is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateAnime()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Anime!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!AnimeExists(Anime!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/animes");
+    }
+
+    private bool AnimeExists(int id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Anime.Any(e => e.Id == id);
+    }
+}

@@ -1,0 +1,86 @@
+﻿@page "/animes"
+@rendermode InteractiveServer
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using AnimeAndMangaDatabase.Models
+@using AnimeAndMangaDatabase.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<AnimeAndMangaDatabase.Data.AnimeAndMangaDatabaseContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Anime Index</h1>
+
+
+@*A basic search field that will be updated to something much nicer.*@
+
+@*<div>
+    <form action="/animes" data-enhance data-permanent>
+        <input type="search" name="titleFilter" />
+        <input type="submit" value="Search" />
+    </form>
+</div>*@
+
+
+@*Here the search is interactive and using the @bind:event="oninput" for a more dynamic and 
+    and interactive search. The search will fire once a user begins to type in the field. The 
+    filter runs as each character is typed.
+*@
+
+<input type="search" @bind="titleFilter" @bind:event="oninput" />
+
+<p>
+    <a href="animes/create">Create New</a>
+</p>
+@*Create the gris to display the information*@
+
+<div>
+<QuickGrid Class="table" Items="FilteredAnime" Pagination="pagination">
+    <PropertyColumn Property="anime => anime.Title" Sortable="true" Title="Name of Anime"/>
+    <PropertyColumn Property="anime => anime.DateLastWatched" Title="Date Last Watched"/>
+    <PropertyColumn Property="anime => anime.ShowStillOngoing" Title="Is the show still ongoing?"/>
+    <PropertyColumn Property="anime => anime.WaitingForNewDubs" Title="Are you waiting for new dubs?"/>
+    <PropertyColumn Property="anime => anime.WaitingForNewSeason" Title="Is there a new season coming out?"/>
+    <PropertyColumn Property="anime => anime.ReleaseDateForNextSeason" Title="What is the release date for the new season?"/>
+    <PropertyColumn Property="anime => anime.Genre" Title="What is the genre?"/>
+    <PropertyColumn Property="anime => anime.Rating" />
+    <TemplateColumn Context="anime">
+        <a href="@($"animes/edit?id={anime.Id}")">Edit</a> |
+        <a href="@($"animes/details?id={anime.Id}")">Details</a> |
+        <a href="@($"animes/delete?id={anime.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+</div>
+<Paginator State="pagination" />
+@code {
+    private AnimeAndMangaDatabaseContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+
+
+    //Sets the function to run a search
+    // The commented out function is for SSR a static site.
+
+    @* [SupplyParameterFromQuery]
+    private string? TitleFilter { get; set; }
+
+
+     private IQueryable<Anime> FilteredAnime =>
+     context.Anime.Where(m => m.Title!.Contains(TitleFilter ?? string.Empty));*@
+
+    @* This is for a more interactive search *@
+
+    private string titleFilter = string.Empty;
+    private IQueryable<Anime> FilteredAnime =>
+        context.Anime.Where(m => m.Title!.Contains(titleFilter));
+
+
+    // Sets how many items can be seen at a time for the pagination
+
+    private PaginationState pagination = new PaginationState { ItemsPerPage = 5 };
+}

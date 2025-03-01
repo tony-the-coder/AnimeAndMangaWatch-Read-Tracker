@@ -1,0 +1,60 @@
+﻿@page "/animes/details"
+@using Microsoft.EntityFrameworkCore
+@using AnimeAndMangaDatabase.Models
+@inject IDbContextFactory<AnimeAndMangaDatabase.Data.AnimeAndMangaDatabaseContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Anime</h2>
+    <hr />
+    @if (anime is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Title</dt>
+            <dd class="col-sm-10">@anime.Title</dd>
+            <dt class="col-sm-2">Date Last Watched</dt>
+            <dd class="col-sm-10">@anime.DateLastWatched</dd>
+            <dt class="col-sm-2">Is the show still ongoing?</dt>
+            <dd class="col-sm-10">@anime.ShowStillOngoing</dd>
+            <dt class="col-sm-2">Are you waiting for new dubs?</dt>
+            <dd class="col-sm-10">@anime.WaitingForNewDubs</dd>
+            <dt class="col-sm-2">Is there a new season coming out?</dt>
+            <dd class="col-sm-10">@anime.WaitingForNewSeason</dd>
+            <dt class="col-sm-2">What is the release date for the new season?</dt>
+            <dd class="col-sm-10">@anime.ReleaseDateForNextSeason</dd>
+            <dt class="col-sm-2">What is the genre?</dt>
+            <dd class="col-sm-10">@anime.Genre</dd>
+            <dt class="col-sm-2">Rating</dt>
+            <dd class="col-sm-10">@anime.Rating</dd>
+        </dl>
+        <div>
+            <a href="@($"/animes/edit?id={anime.Id}")">Edit</a> |
+            <a href="@($"/animes")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Anime? anime;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        anime = await context.Anime.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (anime is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}
